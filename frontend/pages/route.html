@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route Management - Smart Bus System</title>
+  <!-- SEO & Styles -->
+  <meta name="description" content="Configure transport routes, map source and destination terminals, and calculate distances.">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+  <!-- Layout Shell (Sidebar & Header Injected Here) -->
+  <div id="layout-wrapper" class="app-container">
+    <main class="main-content">
+      
+      <!-- Filter and Add Row -->
+      <section class="filter-bar animate-fade-in-up">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="route-search" placeholder="Search by source or destination...">
+        </div>
+        
+        <div class="filter-controls">
+          <button class="btn btn-primary" onclick="openAddRouteModal()">
+            <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add Route
+          </button>
+        </div>
+      </section>
+
+      <!-- Main Route Table -->
+      <section class="card-block animate-fade-in-up" style="animation-delay: 0.15s;">
+        <div class="card-block-title">Transit Routes Directory</div>
+        
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Route ID</th>
+                <th>Source Location</th>
+                <th>Destination Location</th>
+                <th>Distance (km)</th>
+                <th style="text-align: right; padding-right: 24px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="routes-table-body">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                  Loading routes data...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+     Add Route Modal Form (Floating Labels)
+     ========================================================================== -->
+  <div class="modal-overlay" id="add-route-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Add New Route</h3>
+        <button class="modal-close">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </div>
+      
+      <form id="add-route-form">
+        <div class="modal-body">
+          <div class="alert alert-danger" id="add-route-error" style="display: none;"></div>
+          
+          <div class="form-group">
+            <input type="text" id="add-source" class="form-control" placeholder=" " required>
+            <label class="form-label" for="add-source">Source Location</label>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="add-destination" class="form-control" placeholder=" " required>
+            <label class="form-label" for="add-destination">Destination Location</label>
+          </div>
+          
+          <div class="form-group">
+            <input type="number" id="add-distance" class="form-control" placeholder=" " step="0.01" min="0.1" required>
+            <label class="form-label" for="add-distance">Distance (Kilometers)</label>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="add-submit-btn">Save Route</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+     Edit Route Modal Form (Floating Labels)
+     ========================================================================== -->
+  <div class="modal-overlay" id="edit-route-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Edit Route Details</h3>
+        <button class="modal-close">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </div>
+      
+      <form id="edit-route-form">
+        <input type="hidden" id="edit-route-id">
+        <div class="modal-body">
+          <div class="alert alert-danger" id="edit-route-error" style="display: none;"></div>
+          
+          <div class="form-group">
+            <input type="text" id="edit-source" class="form-control" placeholder=" " required>
+            <label class="form-label" for="edit-source">Source Location</label>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="edit-destination" class="form-control" placeholder=" " required>
+            <label class="form-label" for="edit-destination">Destination Location</label>
+          </div>
+          
+          <div class="form-group">
+            <input type="number" id="edit-distance" class="form-control" placeholder=" " step="0.01" min="0.1" required>
+            <label class="form-label" for="edit-distance">Distance (Kilometers)</label>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="edit-submit-btn">Update Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/main.js"></script>
+
+  <script>
+    let routesList = [];
+
+    // Initialize list load
+    async function loadRoutesList() {
+      const tableBody = document.getElementById('routes-table-body');
+      const searchQuery = document.getElementById('route-search').value.trim();
+
+      let endpoint = '/routes';
+      if (searchQuery) endpoint += `?search=${encodeURIComponent(searchQuery)}`;
+
+      try {
+        const data = await apiFetch(endpoint);
+        
+        if (data.success) {
+          routesList = data.routes;
+          
+          if (routesList.length === 0) {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                  No routes registered matching the filters.
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          tableBody.innerHTML = routesList.map(route => {
+            return `
+              <tr>
+                <td style="font-weight: 600; color: var(--text-muted);">#RT-${route.RouteID}</td>
+                <td style="font-weight: 700; color: var(--sidebar-color);">${route.Source}</td>
+                <td style="font-weight: 700; color: var(--sidebar-color);">${route.Destination}</td>
+                <td><span style="font-weight: 700; color: var(--primary-color);">${route.Distance} km</span></td>
+                <td style="text-align: right; padding-right: 12px;">
+                  <button class="btn-icon btn-icon-edit" onclick="openEditRouteModal(${route.RouteID})" title="Edit Details">
+                    <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  </button>
+                  <button class="btn-icon btn-icon-delete" onclick="handleDeleteRoute(${route.RouteID}, '${route.Source}', '${route.Destination}')" title="Remove Route">
+                    <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 40px; color: var(--danger-color); font-weight: 600;">
+              Error loading routes data from server.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Modal Control wrappers
+    function openAddRouteModal() {
+      document.getElementById('add-route-form').reset();
+      document.getElementById('add-route-error').style.display = 'none';
+      openModal('add-route-modal');
+    }
+
+    function openEditRouteModal(routeId) {
+      const route = routesList.find(r => r.RouteID === routeId);
+      if (!route) return;
+
+      document.getElementById('edit-route-error').style.display = 'none';
+      document.getElementById('edit-route-id').value = route.RouteID;
+      document.getElementById('edit-source').value = route.Source;
+      document.getElementById('edit-destination').value = route.Destination;
+      document.getElementById('edit-distance').value = route.Distance;
+
+      openModal('edit-route-modal');
+    }
+
+    // Handlers for Add Submit
+    document.getElementById('add-route-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        source: document.getElementById('add-source').value.trim(),
+        destination: document.getElementById('add-destination').value.trim(),
+        distance: parseFloat(document.getElementById('add-distance').value)
+      };
+
+      const errorBanner = document.getElementById('add-route-error');
+      const submitBtn = document.getElementById('add-submit-btn');
+      
+      errorBanner.style.display = 'none';
+      submitBtn.disabled = true;
+      
+      try {
+        const response = await apiFetch('/routes', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        if (response.success) {
+          closeModal('add-route-modal');
+          loadRoutesList();
+        }
+      } catch (err) {
+        errorBanner.innerText = err.message || 'Error occurred while saving.';
+        errorBanner.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Handlers for Edit Submit
+    document.getElementById('edit-route-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const routeId = document.getElementById('edit-route-id').value;
+      const payload = {
+        source: document.getElementById('edit-source').value.trim(),
+        destination: document.getElementById('edit-destination').value.trim(),
+        distance: parseFloat(document.getElementById('edit-distance').value)
+      };
+
+      const errorBanner = document.getElementById('edit-route-error');
+      const submitBtn = document.getElementById('edit-submit-btn');
+      
+      errorBanner.style.display = 'none';
+      submitBtn.disabled = true;
+      
+      try {
+        const response = await apiFetch(`/routes/${routeId}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+
+        if (response.success) {
+          closeModal('edit-route-modal');
+          loadRoutesList();
+        }
+      } catch (err) {
+        errorBanner.innerText = err.message || 'Error occurred while updating.';
+        errorBanner.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Handle delete action
+    async function handleDeleteRoute(routeId, source, destination) {
+      const confirmDelete = confirm(`Are you sure you want to delete Route: ${source} to ${destination}?\nWarning: This will also remove any schedules mapped to this route.`);
+      if (!confirmDelete) return;
+
+      try {
+        const response = await apiFetch(`/routes/${routeId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.success) {
+          loadRoutesList();
+        }
+      } catch (err) {
+        alert(err.message || 'Failed to delete route.');
+      }
+    }
+
+    // Attach search event listener
+    document.getElementById('route-search').addEventListener('input', debounce(loadRoutesList, 300));
+
+    // Debounce helper
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Initial load
+    loadRoutesList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Smart Bus System</title>
+  <!-- SEO & Styling -->
+  <meta name="description" content="Secure administrator login portal for Smart Bus Routing and Scheduling System.">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+  <div class="login-split-container">
+    
+    <!-- Left Marketing Pane -->
+    <div class="login-left-pane">
+      <div class="login-left-brand">
+        <svg viewBox="0 0 24 24">
+          <path d="M18 11H6V6h12m-1.5 11a1.5 1.5 0 1 1-1.5-1.5 1.5 1.5 0 0 1 1.5 1.5M9.5 17a1.5 1.5 0 1 1-1.5-1.5 1.5 1.5 0 0 1 1.5 1.5M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h8v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1.78c.61-.55 1-1.34 1-2.22V9a7 7 0 0 0-14 0v7z"/>
+        </svg>
+        <h2>Smart Bus</h2>
+      </div>
+
+      <div class="login-left-hero">
+        <h3>Managing Transit,<br>Simplified.</h3>
+        <p>A unified administrator workspace to monitor live bus statistics, configure route maps, and compile daily schedules.</p>
+      </div>
+
+      <div class="login-left-footer">
+        &copy; 2026 Smart Bus Systems Ltd. All rights reserved.
+      </div>
+    </div>
+
+    <!-- Right Login Form Pane -->
+    <div class="login-right-pane">
+      <div class="login-form-card">
+        
+        <!-- Header -->
+        <div class="login-form-header">
+          <h3>Admin Sign In</h3>
+          <p>Enter your system credentials below to continue</p>
+        </div>
+
+        <!-- Error Message Banner -->
+        <div class="alert alert-danger" id="error-alert" style="display: none;">
+          <svg style="width: 20px; height: 20px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <span id="error-message">Invalid credentials.</span>
+        </div>
+
+        <!-- Form using Floating labels -->
+        <form id="login-form">
+          
+          <div class="form-group">
+            <input 
+              type="email" 
+              id="login-email" 
+              class="form-control" 
+              placeholder=" " 
+              required 
+              autocomplete="email"
+            >
+            <label class="form-label" for="login-email">Email Address</label>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 28px;">
+            <input 
+              type="password" 
+              id="login-password" 
+              class="form-control" 
+              placeholder=" " 
+              required 
+              autocomplete="current-password"
+            >
+            <label class="form-label" for="login-password">Password</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; height: 50px;" id="submit-btn">
+            Sign In
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 24px;">
+          <a href="../index.html" style="font-size: 0.9rem; color: var(--primary-color); font-weight: 600;">&larr; Back to Landing Page</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    // Handle form submission
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const submitBtn = document.getElementById('submit-btn');
+      const errorAlert = document.getElementById('error-alert');
+      const errorMessage = document.getElementById('error-message');
+
+      // Clear alert
+      errorAlert.style.display = 'none';
+
+      // Set loading state
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Signing In...';
+
+      try {
+        const response = await apiFetch('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+
+        if (response.success && response.token) {
+          // Store token/user info and redirect
+          Auth.login(response.token, response.admin);
+        } else {
+          throw new Error(response.message || 'Login failed.');
+        }
+      } catch (err) {
+        console.error(err);
+        errorMessage.innerText = err.message || 'Connecting to backend failed. Make sure server is running.';
+        errorAlert.style.display = 'flex';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>
