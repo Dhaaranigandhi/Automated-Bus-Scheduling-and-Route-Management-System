@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const scheduleController_1 = require("../controllers/scheduleController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', scheduleController_1.getAllSchedules);
+router.get('/recommend', scheduleController_1.getAIScheduleRecommendation);
+router.get('/:id', scheduleController_1.getScheduleById);
+router.post('/', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager', 'Scheduler'), (0, validate_1.validate)(scheduleController_1.scheduleCreateSchema), scheduleController_1.createSchedule);
+router.put('/:id', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager', 'Scheduler'), (0, validate_1.validate)(scheduleController_1.scheduleCreateSchema), scheduleController_1.updateSchedule);
+router.delete('/:id', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager', 'Scheduler'), scheduleController_1.deleteSchedule);
+exports.default = router;

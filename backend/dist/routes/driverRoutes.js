@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const driverController_1 = require("../controllers/driverController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', driverController_1.getAllDrivers);
+router.get('/:id', driverController_1.getDriverById);
+router.post('/', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager'), (0, validate_1.validate)(driverController_1.driverCreateSchema), driverController_1.createDriver);
+router.put('/:id', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager'), (0, validate_1.validate)(driverController_1.driverCreateSchema), driverController_1.updateDriver);
+router.delete('/:id', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager'), driverController_1.deleteDriver);
+router.post('/attendance', (0, validate_1.validate)(driverController_1.attendanceLogSchema), driverController_1.logAttendance);
+exports.default = router;

@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const settingController_1 = require("../controllers/settingController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', settingController_1.getSettings);
+router.post('/', (0, auth_1.restrictTo)('Super Administrator'), (0, validate_1.validate)(settingController_1.settingUpdateSchema), settingController_1.updateSetting);
+exports.default = router;

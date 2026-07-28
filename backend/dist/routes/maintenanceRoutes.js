@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const maintenanceController_1 = require("../controllers/maintenanceController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', maintenanceController_1.getAllMaintenances);
+router.post('/', (0, auth_1.restrictTo)('Super Administrator', 'Maintenance Manager'), (0, validate_1.validate)(maintenanceController_1.maintenanceCreateSchema), maintenanceController_1.createMaintenance);
+router.put('/:id/status', (0, auth_1.restrictTo)('Super Administrator', 'Maintenance Manager'), maintenanceController_1.updateMaintenanceStatus);
+exports.default = router;

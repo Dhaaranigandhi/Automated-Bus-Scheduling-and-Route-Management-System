@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const complaintController_1 = require("../controllers/complaintController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', complaintController_1.getAllComplaints);
+router.post('/', (0, auth_1.restrictTo)('Student/Passenger', 'Faculty/Employee'), (0, validate_1.validate)(complaintController_1.complaintCreateSchema), complaintController_1.createComplaint);
+router.put('/:id/resolve', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager'), complaintController_1.resolveComplaint);
+exports.default = router;

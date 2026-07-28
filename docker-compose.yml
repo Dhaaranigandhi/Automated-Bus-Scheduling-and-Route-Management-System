@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8.0
+    container_name: transitflow-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Dhaaranigandhi@2604
+      MYSQL_DATABASE: routewise
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    container_name: transitflow-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: transitflow-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DATABASE_URL=mysql://root:Dhaaranigandhi%402604@database:3306/routewise
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=transitflow_jwt_access_secret_key_2026
+      - JWT_REFRESH_SECRET=transitflow_jwt_refresh_secret_key_2026
+      - NODE_ENV=production
+    depends_on:
+      - database
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: transitflow-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql-data:

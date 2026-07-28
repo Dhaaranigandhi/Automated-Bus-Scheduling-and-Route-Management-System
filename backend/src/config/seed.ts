@@ -1,0 +1,222 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('Seeding Database...');
+
+  // 1. Seed Roles
+  const roles = [
+    { name: 'Super Administrator', description: 'Complete administrative access' },
+    { name: 'Transport Manager', description: 'Fleet and route planner manager' },
+    { name: 'Dispatcher', description: 'Live tracking monitor and dispatcher' },
+    { name: 'Scheduler', description: 'Schedule allocator' },
+    { name: 'Driver', description: 'Vehicle operator' },
+    { name: 'Bus Operator', description: 'Third party bus contractor' },
+    { name: 'Maintenance Manager', description: 'Garage and service logger' },
+    { name: 'Student/Passenger', description: 'Commuter portal user' },
+    { name: 'Faculty/Employee', description: 'Commuter portal user' },
+    { name: 'Security Officer', description: 'Gate and parking log monitor' },
+    { name: 'Finance Officer', description: 'Fuel and repair billing tracker' },
+  ];
+
+  const roleMap = new Map<string, number>();
+
+  for (const r of roles) {
+    const roleRecord = await prisma.role.upsert({
+      where: { name: r.name },
+      update: {},
+      create: { name: r.name, description: r.description },
+    });
+    roleMap.set(r.name, roleRecord.id);
+  }
+  console.log('Roles seeded successfully.');
+
+  // 2. Hash default passwords
+  const salt = await bcrypt.genSalt(10);
+  const adminPasswordHash = await bcrypt.hash('admin123', salt);
+  const driverPasswordHash = await bcrypt.hash('driver123', salt);
+  const passengerPasswordHash = await bcrypt.hash('passenger123', salt);
+
+  // 3. Seed Users
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@transitflow.com' },
+    update: {},
+    create: {
+      email: 'admin@transitflow.com',
+      password: adminPasswordHash,
+      name: 'Super Admin User',
+      roleId: roleMap.get('Super Administrator')!,
+    },
+  });
+
+  const driverUser = await prisma.user.upsert({
+    where: { email: 'driver@transitflow.com' },
+    update: {},
+    create: {
+      email: 'driver@transitflow.com',
+      password: driverPasswordHash,
+      name: 'John Doe (Driver)',
+      roleId: roleMap.get('Driver')!,
+    },
+  });
+
+  const passengerUser = await prisma.user.upsert({
+    where: { email: 'student@transitflow.com' },
+    update: {},
+    create: {
+      email: 'student@transitflow.com',
+      password: passengerPasswordHash,
+      name: 'Alice Smith (Student)',
+      roleId: roleMap.get('Student/Passenger')!,
+    },
+  });
+
+  console.log('Users seeded successfully.');
+
+  // 4. Seed Drivers
+  const driver = await prisma.driver.upsert({
+    where: { licenseNumber: 'DL-2026-0001' },
+    update: {},
+    create: {
+      userId: driverUser.id,
+      licenseNumber: 'DL-2026-0001',
+      licenseExpiry: new Date('2035-12-31'),
+      medicalStatus: 'FIT',
+      availabilityStatus: 'AVAILABLE',
+      performanceScore: 4.8,
+    },
+  });
+  console.log('Driver profiles seeded successfully.');
+
+  // 5. Seed Buses
+  const bus1 = await prisma.bus.upsert({
+    where: { registrationNumber: 'KA-01-F-1234' },
+    update: {},
+    create: {
+      registrationNumber: 'KA-01-F-1234',
+      model: 'Volvo B11R',
+      capacity: 45,
+      status: 'AVAILABLE',
+      category: 'AC_SEATER',
+    },
+  });
+
+  const bus2 = await prisma.bus.upsert({
+    where: { registrationNumber: 'KA-01-F-5678' },
+    update: {},
+    create: {
+      registrationNumber: 'KA-01-F-5678',
+      model: 'Tata LPO 1618',
+      capacity: 55,
+      status: 'AVAILABLE',
+      category: 'NON_AC_SEATER',
+    },
+  });
+  console.log('Bus Fleet seeded successfully.');
+
+  // 6. Seed Routes
+  const route1 = await prisma.route.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      name: 'Majestic to Electronic City',
+      startLocation: 'Majestic Bus Stand',
+      endLocation: 'Electronic City Phase 1',
+      totalDistance: 22.5,
+      totalDuration: 45,
+    },
+  });
+
+  // Seed RouteStops for Route 1
+  const stops = [
+    { stopName: 'Majestic Terminal', stopOrder: 1, latitude: 12.977872, longitude: 77.570688, etaOffset: 0 },
+    { stopName: 'Shanti Nagar', stopOrder: 2, latitude: 12.953997, longitude: 77.596313, etaOffset: 10 },
+    { stopName: 'Silk Board Junction', stopOrder: 3, latitude: 12.917651, longitude: 77.624443, etaOffset: 30 },
+    { stopName: 'Electronic City Toll', stopOrder: 4, latitude: 12.845213, longitude: 77.663112, etaOffset: 45 },
+  ];
+
+  await prisma.routeStop.deleteMany({ where: { routeId: route1.id } });
+  for (const s of stops) {
+    await prisma.routeStop.create({
+      data: {
+        routeId: route1.id,
+        stopName: s.stopName,
+        stopOrder: s.stopOrder,
+        latitude: s.latitude,
+        longitude: s.longitude,
+        etaOffset: s.etaOffset,
+      },
+    });
+  }
+  console.log('Routes and Stops seeded successfully.');
+
+  // 7. Seed Passenger profiles
+  const passenger = await prisma.passenger.upsert({
+    where: { idCardNumber: 'ST-99481' },
+    update: {},
+    create: {
+      userId: passengerUser.id,
+      passengerType: 'STUDENT',
+      idCardNumber: 'ST-99481',
+    },
+  });
+
+  await prisma.student.upsert({
+    where: { passengerId: passenger.id },
+    update: {},
+    create: {
+      passengerId: passenger.id,
+      rollNumber: 'ROLL-1029-A',
+      department: 'Computer Science & Engineering',
+      batch: 'Class of 2027',
+    },
+  });
+  console.log('Commuter profiles seeded successfully.');
+
+  // 8. Seed Schedules
+  await prisma.schedule.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      routeId: route1.id,
+      busId: bus1.id,
+      driverId: driver.id,
+      departureTime: '08:30',
+      arrivalTime: '09:15',
+      recurrence: 'DAILY',
+      status: 'ACTIVE',
+    },
+  });
+  console.log('Schedules seeded successfully.');
+
+  // 9. Seed Settings
+  const settings = [
+    { key: 'system_brand', value: 'TransitFlow', description: 'Product Brand Name' },
+    { key: 'max_speed_limit', value: '70', description: 'Maximum permitted fleet speed (km/h)' },
+    { key: 'geofence_radius_meters', value: '150', description: 'Standard arrival detection radius' },
+  ];
+
+  for (const s of settings) {
+    await prisma.setting.upsert({
+      where: { key: s.key },
+      update: {},
+      create: { key: s.key, value: s.value, description: s.description },
+    });
+  }
+  console.log('Configuration Settings seeded successfully.');
+  
+  console.log('Seeding Complete!');
+}
+
+main()
+  .catch((e) => {
+    console.error('Error during seeding', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const fuelController_1 = require("../controllers/fuelController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/', fuelController_1.getAllFuelLogs);
+router.post('/', (0, auth_1.restrictTo)('Super Administrator', 'Transport Manager', 'Finance Officer'), (0, validate_1.validate)(fuelController_1.fuelLogSchema), fuelController_1.createFuelLog);
+exports.default = router;

@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const tripController_1 = require("../controllers/tripController");
+const auth_1 = require("../middlewares/auth");
+const validate_1 = require("../middlewares/validate");
+const router = (0, express_1.Router)();
+router.use(auth_1.authGuard);
+router.get('/live', tripController_1.getLiveTrips);
+router.post('/start', tripController_1.startTrip);
+router.post('/:id/end', tripController_1.endTrip);
+router.post('/:id/gps', (0, validate_1.validate)(tripController_1.gpsLogSchema), tripController_1.logGPSLocation);
+router.get('/:id/playback', tripController_1.getTripPlayback);
+exports.default = router;
