@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma';
 import { ApiError } from '../middlewares/error';
 import { AuthRequest } from '../middlewares/auth';
@@ -8,6 +9,9 @@ import { AuthRequest } from '../middlewares/auth';
 export const driverCreateSchema = z.object({
   body: z.object({
     userId: z.number().int().optional(),
+    name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+    email: z.string().email('Provide a valid email address').optional(),
+    password: z.string().min(6, 'Password must be at least 6 characters').optional(),
     licenseNumber: z.string().min(5, 'Provide a valid license number'),
     licenseExpiry: z.string().transform((str) => new Date(str)),
     medicalStatus: z.string().optional(),
@@ -90,11 +94,13 @@ export const getDriverById = async (req: AuthRequest, res: Response, next: any) 
   } catch (err) {
     next(err);
   }
-};
-
-export const createDriver = async (req: AuthRequest, res: Response, next: any) => {
+};export const createDriver = async (req: AuthRequest, res: Response, next: any) => {
   try {
-    const { userId, licenseNumber, licenseExpiry, medicalStatus, availabilityStatus } = req.body;
+    const { userId, name, email, password, licenseNumber, licenseExpiry, medicalStatus, availabilityStatus } = req.body;
+
+    if (!userId && (!name || !email || !password)) {
+      throw new ApiError(400, 'Specify userId, or provide name, email, and password to create a new driver user');
+    }
 
     const existingDriver = await prisma.driver.findUnique({
       where: { licenseNumber },
@@ -104,16 +110,64 @@ export const createDriver = async (req: AuthRequest, res: Response, next: any) =
       throw new ApiError(400, 'A driver with this license number already exists');
     }
 
-    if (userId) {
-      const userLink = await prisma.driver.findUnique({ where: { userId } });
-      if (userLink) {
-        throw new ApiError(400, 'The selected user account is already linked to a driver profile');
+    let finalUserId = userId;
+
+    if (!finalUserId) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        throw new ApiError(400, 'A user account with this email address already exists');
       }
+
+      const driverRole = await prisma.role.findUnique({
+        where: { name: 'Driver' }
+      });
+
+      if (!driverRole) {
+        throw new ApiError(500, 'Driver role not configured in the system');
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password, salt);
+
+      const driver = await prisma.$transaction(async (tx) => {
+        const dbUser = await tx.user.create({
+          data: {
+            name: name!,
+            email: email!,
+            password: passwordHash,
+            roleId: driverRole.id
+          }
+        });
+
+        return await tx.driver.create({
+          data: {
+            userId: dbUser.id,
+            licenseNumber,
+            licenseExpiry: new Date(licenseExpiry),
+            medicalStatus,
+            availabilityStatus: availabilityStatus || 'AVAILABLE',
+          }
+        });
+      });
+
+      res.status(201).json({
+        success: true,
+        driver,
+      });
+      return;
+    }
+
+    const userLink = await prisma.driver.findUnique({ where: { userId: finalUserId } });
+    if (userLink) {
+      throw new ApiError(400, 'The selected user account is already linked to a driver profile');
     }
 
   const driver = await prisma.driver.create({
    data: {
-    userId,
+    userId: finalUserId,
     licenseNumber,
     licenseExpiry: new Date(licenseExpiry),
     medicalStatus,
@@ -129,6 +183,8 @@ export const createDriver = async (req: AuthRequest, res: Response, next: any) =
     next(err);
   }
 };
+
+
 
 export const updateDriver = async (req: AuthRequest, res: Response, next: any) => {
   try {
@@ -155,10 +211,10 @@ export const updateDriver = async (req: AuthRequest, res: Response, next: any) =
       where: { id: driverId },
       data: {
         licenseNumber,
-        licenseExpiry,
+        licenseExpiry: licenseExpiry ? new Date(licenseExpiry) : undefined,
         medicalStatus,
         availabilityStatus,
-        performanceScore,
+        performanceScore: performanceScore !== undefined ? Number(performanceScore) : undefined,
       },
     });
 

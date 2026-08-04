@@ -349,7 +349,7 @@ const BusesPage: React.FC = () => {
                     className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
                   />
                   <label htmlFor="regNum" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none transition-all peer-focus:top-0 peer-focus:scale-90 peer-focus:bg-white peer-focus:px-2 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-2">
-                    Registration Number (e.g. KA-01-F-1234)
+                    Registration Number (e.g. DL-01-AB-1234)
                   </label>
                 </div>
 

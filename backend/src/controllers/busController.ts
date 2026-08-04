@@ -119,7 +119,7 @@ export const createBus = async (req: AuthRequest, res: Response, next: any) => {
       data: {
         userId: req.user?.id,
         action: 'CREATE_BUS',
-        details: `Created vehicle KA-${registrationNumber} (ID: ${bus.id})`,
+        details: `Created vehicle DL-${registrationNumber} (ID: ${bus.id})`,
       },
     });
 

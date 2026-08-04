@@ -16,6 +16,7 @@ import LiveTrackingPage from './pages/LiveTrackingPage';
 import MaintenancePage from './pages/MaintenancePage';
 import FuelPage from './pages/FuelPage';
 import ComplaintsPage from './pages/ComplaintsPage';
+import SettingsPage from './pages/SettingsPage';
 
 // Private Route Guard
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +65,7 @@ function App() {
             <Route path="maintenance" element={<MaintenancePage />} />
             <Route path="fuel" element={<FuelPage />} />
             <Route path="complaints" element={<ComplaintsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
             {/* Fallback for admin console */}
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Route>

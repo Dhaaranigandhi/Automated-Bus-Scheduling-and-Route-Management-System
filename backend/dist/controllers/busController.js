@@ -114,7 +114,7 @@ const createBus = async (req, res, next) => {
             data: {
                 userId: req.user?.id,
                 action: 'CREATE_BUS',
-                details: `Created vehicle KA-${registrationNumber} (ID: ${bus.id})`,
+                details: `Created vehicle DL-${registrationNumber} (ID: ${bus.id})`,
             },
         });
         res.status(201).json({

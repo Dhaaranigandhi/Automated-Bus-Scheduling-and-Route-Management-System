@@ -34,6 +34,9 @@ const DriversPage: React.FC = () => {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
 
   // Form states
+  const [driverName, setDriverName] = useState('');
+  const [driverEmail, setDriverEmail] = useState('');
+  const [driverPassword, setDriverPassword] = useState('');
   const [userId, setUserId] = useState<string>('');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [licenseExpiry, setLicenseExpiry] = useState('');
@@ -78,6 +81,9 @@ const DriversPage: React.FC = () => {
     setError(null);
     try {
       const payload: any = {
+        name: driverName,
+        email: driverEmail,
+        password: driverPassword,
         licenseNumber,
         licenseExpiry,
         medicalStatus,
@@ -89,12 +95,15 @@ const DriversPage: React.FC = () => {
       if (res.data.success) {
         setIsAddOpen(false);
         fetchDrivers();
+        setDriverName('');
+        setDriverEmail('');
+        setDriverPassword('');
         setLicenseNumber('');
         setLicenseExpiry('');
         setUserId('');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to register driver');
+      setError(err.response?.data?.message || err.message || 'Failed to register driver');
     }
   };
 
@@ -303,12 +312,12 @@ const DriversPage: React.FC = () => {
       {/* Add Driver Profile Dialog */}
       <AnimatePresence>
         {isAddOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 bg-slate-900/60 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white border border-slate-200 w-full max-w-lg p-8 rounded-[2rem] shadow-xl relative"
+              className="bg-white border border-slate-200 w-full max-w-lg p-8 rounded-[2rem] shadow-xl relative max-h-[90vh] overflow-y-auto"
             >
               <button 
                 onClick={() => setIsAddOpen(false)}
@@ -323,6 +332,51 @@ const DriversPage: React.FC = () => {
 
               <form onSubmit={handleAddSubmit} className="flex flex-col gap-5">
                 
+                <div className="relative group">
+                  <input
+                    type="text"
+                    id="drvName"
+                    required
+                    value={driverName}
+                    onChange={(e) => setDriverName(e.target.value)}
+                    placeholder=" "
+                    className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
+                  />
+                  <label htmlFor="drvName" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none transition-all peer-focus:top-0 peer-focus:scale-90 peer-focus:bg-white peer-focus:px-2 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-2">
+                    Driver Name (e.g. John Doe)
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    type="email"
+                    id="drvEmail"
+                    required
+                    value={driverEmail}
+                    onChange={(e) => setDriverEmail(e.target.value)}
+                    placeholder=" "
+                    className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
+                  />
+                  <label htmlFor="drvEmail" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none transition-all peer-focus:top-0 peer-focus:scale-90 peer-focus:bg-white peer-focus:px-2 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-2">
+                    Driver Email (e.g. john.doe@transitflow.com)
+                  </label>
+                </div>
+
+                <div className="relative group">
+                  <input
+                    type="password"
+                    id="drvPassword"
+                    required
+                    value={driverPassword}
+                    onChange={(e) => setDriverPassword(e.target.value)}
+                    placeholder=" "
+                    className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
+                  />
+                  <label htmlFor="drvPassword" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none transition-all peer-focus:top-0 peer-focus:scale-90 peer-focus:bg-white peer-focus:px-2 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-2">
+                    Password (at least 6 characters)
+                  </label>
+                </div>
+
                 <div className="relative group">
                   <input
                     type="text"
@@ -392,12 +446,12 @@ const DriversPage: React.FC = () => {
       {/* Edit Driver Dialog */}
       <AnimatePresence>
         {isEditOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 bg-slate-900/60 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white border border-slate-200 w-full max-w-lg p-8 rounded-[2rem] shadow-xl relative"
+              className="bg-white border border-slate-200 w-full max-w-lg p-8 rounded-[2rem] shadow-xl relative max-h-[90vh] overflow-y-auto"
             >
               <button 
                 onClick={() => setIsEditOpen(false)}
@@ -501,12 +555,12 @@ const DriversPage: React.FC = () => {
       {/* Manual Check-in attendance modal */}
       <AnimatePresence>
         {isAttendanceOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-10 bg-slate-900/60 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white border border-slate-200 w-full max-w-md p-8 rounded-[2rem] shadow-xl relative"
+              className="bg-white border border-slate-200 w-full max-w-md p-8 rounded-[2rem] shadow-xl relative max-h-[90vh] overflow-y-auto"
             >
               <button 
                 onClick={() => setIsAttendanceOpen(false)}

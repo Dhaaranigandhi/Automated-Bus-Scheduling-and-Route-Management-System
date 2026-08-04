@@ -46,7 +46,7 @@ This document catalogs the REST API endpoints, input validation criteria, and au
 * **Method**: `GET`
 * **Path**: `/api/buses`
 * **Auth Requirement**: JWT Access Token (Transport Manager, Dispatcher, Scheduler)
-* **Query Options**: `?search=KA-01`
+* **Query Options**: `?search=DL-01`
 * **Success Response (200 OK)**:
   ```json
   {
@@ -54,7 +54,7 @@ This document catalogs the REST API endpoints, input validation criteria, and au
     "buses": [
       {
         "id": 1,
-        "registrationNumber": "KA-01-F-1234",
+        "registrationNumber": "DL-01-AB-1234",
         "model": "Volvo B11R",
         "capacity": 45,
         "status": "AVAILABLE",
@@ -75,12 +75,12 @@ This document catalogs the REST API endpoints, input validation criteria, and au
 * **Request Schema**:
   ```json
   {
-    "name": "Majestic to Electronic City",
-    "startLocation": "Majestic Bus Stand",
-    "endLocation": "Electronic City Phase 1",
+    "name": "Kashmere Gate to Anand Vihar ISBT",
+    "startLocation": "Kashmere Gate ISBT",
+    "endLocation": "Anand Vihar ISBT",
     "stops": [
-      { "stopName": "Majestic Terminal", "stopOrder": 1, "latitude": 12.9778, "longitude": 77.5706 },
-      { "stopName": "Shanti Nagar", "stopOrder": 2, "latitude": 12.9539, "longitude": 77.5963 }
+      { "stopName": "Kashmere Gate ISBT", "stopOrder": 1, "latitude": 28.6675, "longitude": 77.2282 },
+      { "stopName": "Connaught Place", "stopOrder": 2, "latitude": 28.6304, "longitude": 77.2177 }
     ]
   }
   ```
@@ -90,7 +90,7 @@ This document catalogs the REST API endpoints, input validation criteria, and au
     "success": true,
     "route": {
       "id": 1,
-      "name": "Majestic to Electronic City",
+      "name": "Kashmere Gate to Anand Vihar ISBT",
       "totalDistance": 22.50,
       "totalDuration": 45
     }

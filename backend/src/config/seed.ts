@@ -4,6 +4,27 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log('Clearing existing database entries to remove old Karnataka records...');
+  await prisma.auditLog.deleteMany({});
+  await prisma.notification.deleteMany({});
+  await prisma.complaint.deleteMany({});
+  await prisma.attendance.deleteMany({});
+  await prisma.gPSLocation.deleteMany({});
+  await prisma.trip.deleteMany({});
+  await prisma.schedule.deleteMany({});
+  await prisma.routeStop.deleteMany({});
+  await prisma.route.deleteMany({});
+  await prisma.maintenance.deleteMany({});
+  await prisma.fuelLog.deleteMany({});
+  await prisma.document.deleteMany({});
+  await prisma.student.deleteMany({});
+  await prisma.employee.deleteMany({});
+  await prisma.passenger.deleteMany({});
+  await prisma.driver.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.role.deleteMany({});
+  await prisma.setting.deleteMany({});
+
   console.log('Seeding Database...');
 
   // 1. Seed Roles
@@ -92,10 +113,10 @@ async function main() {
 
   // 5. Seed Buses
   const bus1 = await prisma.bus.upsert({
-    where: { registrationNumber: 'KA-01-F-1234' },
+    where: { registrationNumber: 'DL-01-AB-1234' },
     update: {},
     create: {
-      registrationNumber: 'KA-01-F-1234',
+      registrationNumber: 'DL-01-AB-1234',
       model: 'Volvo B11R',
       capacity: 45,
       status: 'AVAILABLE',
@@ -104,10 +125,10 @@ async function main() {
   });
 
   const bus2 = await prisma.bus.upsert({
-    where: { registrationNumber: 'KA-01-F-5678' },
+    where: { registrationNumber: 'DL-01-AB-5678' },
     update: {},
     create: {
-      registrationNumber: 'KA-01-F-5678',
+      registrationNumber: 'DL-01-AB-5678',
       model: 'Tata LPO 1618',
       capacity: 55,
       status: 'AVAILABLE',
@@ -122,9 +143,9 @@ async function main() {
     update: {},
     create: {
       id: 1,
-      name: 'Majestic to Electronic City',
-      startLocation: 'Majestic Bus Stand',
-      endLocation: 'Electronic City Phase 1',
+      name: 'Kashmere Gate to Anand Vihar ISBT',
+      startLocation: 'Kashmere Gate ISBT',
+      endLocation: 'Anand Vihar ISBT',
       totalDistance: 22.5,
       totalDuration: 45,
     },
@@ -132,10 +153,10 @@ async function main() {
 
   // Seed RouteStops for Route 1
   const stops = [
-    { stopName: 'Majestic Terminal', stopOrder: 1, latitude: 12.977872, longitude: 77.570688, etaOffset: 0 },
-    { stopName: 'Shanti Nagar', stopOrder: 2, latitude: 12.953997, longitude: 77.596313, etaOffset: 10 },
-    { stopName: 'Silk Board Junction', stopOrder: 3, latitude: 12.917651, longitude: 77.624443, etaOffset: 30 },
-    { stopName: 'Electronic City Toll', stopOrder: 4, latitude: 12.845213, longitude: 77.663112, etaOffset: 45 },
+    { stopName: 'Kashmere Gate ISBT', stopOrder: 1, latitude: 28.667500, longitude: 77.228200, etaOffset: 0 },
+    { stopName: 'Connaught Place', stopOrder: 2, latitude: 28.630400, longitude: 77.217700, etaOffset: 10 },
+    { stopName: 'Lajpat Nagar', stopOrder: 3, latitude: 28.570800, longitude: 77.242500, etaOffset: 30 },
+    { stopName: 'Anand Vihar ISBT', stopOrder: 4, latitude: 28.650200, longitude: 77.302700, etaOffset: 45 },
   ];
 
   await prisma.routeStop.deleteMany({ where: { routeId: route1.id } });

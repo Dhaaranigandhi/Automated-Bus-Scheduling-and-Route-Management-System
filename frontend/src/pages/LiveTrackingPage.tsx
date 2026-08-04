@@ -70,20 +70,20 @@ const LiveTrackingPage: React.FC = () => {
               status: 'RUNNING',
               schedule: {
                 route: {
-                  name: 'Majestic to Electronic City',
+                  name: 'Kashmere Gate to Anand Vihar ISBT',
                   totalDistance: '22.50',
                   stops: [
-                    { stopName: 'Majestic Terminal', latitude: 12.9778, longitude: 77.5706 },
-                    { stopName: 'Shanti Nagar', latitude: 12.9539, longitude: 77.5963 },
-                    { stopName: 'Silk Board Junction', latitude: 12.9176, longitude: 77.6244 },
-                    { stopName: 'Electronic City Toll', latitude: 12.8452, longitude: 77.6631 }
+                    { stopName: 'Kashmere Gate ISBT', latitude: 28.6675, longitude: 77.2282 },
+                    { stopName: 'Connaught Place', latitude: 28.6304, longitude: 77.2177 },
+                    { stopName: 'Lajpat Nagar', latitude: 28.5708, longitude: 77.2425 },
+                    { stopName: 'Anand Vihar ISBT', latitude: 28.6502, longitude: 77.3027 }
                   ]
                 },
-                bus: { registrationNumber: 'KA-01-F-1234', model: 'Volvo B11R' },
+                bus: { registrationNumber: 'DL-01-AB-1234', model: 'Volvo B11R' },
                 driver: { user: { name: 'John Doe' } }
               },
-              currentLat: 12.9539,
-              currentLng: 77.5963,
+              currentLat: 28.6304,
+              currentLng: 77.2177,
               currentSpeed: 45
             }
           ]);
@@ -152,13 +152,13 @@ const LiveTrackingPage: React.FC = () => {
       // Simulate historical GPS playback logs
       // In production, we retrieve this from backend: client.get(`/trips/${tripId}/playback`)
       const mockLocations: [number, number][] = [
-        [12.9778, 77.5706],
-        [12.9680, 77.5810],
-        [12.9539, 77.5963],
-        [12.9420, 77.6080],
-        [12.9176, 77.6244],
-        [12.8850, 77.6400],
-        [12.8452, 77.6631],
+        [28.6675, 77.2282],
+        [28.6490, 77.2210],
+        [28.6304, 77.2177],
+        [28.6000, 77.2300],
+        [28.5708, 77.2425],
+        [28.6100, 77.2800],
+        [28.6502, 77.3027],
       ];
       setPlaybackPoints(mockLocations);
     } catch (err) {
@@ -188,7 +188,7 @@ const LiveTrackingPage: React.FC = () => {
     ? playbackPoints[playbackIndex]
     : selectedTrip && selectedTrip.currentLat
       ? [selectedTrip.currentLat, selectedTrip.currentLng!]
-      : [12.9778, 77.5706]; // Majestic Terminal center
+      : [28.6675, 77.2282]; // Kashmere Gate ISBT center
 
   return (
     <div className="flex flex-col gap-6 h-[calc(100vh-8rem)] animate-fade-in-up">

@@ -58,18 +58,18 @@ const PassengerPortal: React.FC = () => {
           arrivalTime: '09:15',
           recurrence: 'DAILY',
           route: {
-            name: 'Majestic to Electronic City',
-            startLocation: 'Majestic Terminal',
-            endLocation: 'Electronic City Phase 1',
+            name: 'Kashmere Gate to Anand Vihar ISBT',
+            startLocation: 'Kashmere Gate ISBT',
+            endLocation: 'Anand Vihar ISBT',
             totalDistance: '22.50',
             stops: [
-              { stopName: 'Majestic Terminal', stopOrder: 1 },
-              { stopName: 'Silk Board Junction', stopOrder: 2 },
-              { stopName: 'Electronic City Toll', stopOrder: 3 }
+              { stopName: 'Kashmere Gate ISBT', stopOrder: 1 },
+              { stopName: 'Lajpat Nagar', stopOrder: 2 },
+              { stopName: 'Anand Vihar ISBT', stopOrder: 3 }
             ]
           },
           bus: {
-            registrationNumber: 'KA-01-F-1234',
+            registrationNumber: 'DL-01-AB-1234',
             model: 'Volvo B11R',
             capacity: 45,
             category: 'AC_SEATER'

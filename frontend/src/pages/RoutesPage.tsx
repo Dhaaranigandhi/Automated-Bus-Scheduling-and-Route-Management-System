@@ -90,11 +90,22 @@ const RoutesPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     try {
+      // Sync first and last stops with startLoc/endLoc to prevent generic placeholders
+      const finalStops = stops.map((s, idx) => {
+        if (idx === 0 && (s.stopName === 'Source Terminal' || s.stopName === '')) {
+          return { ...s, stopName: startLoc };
+        }
+        if (idx === stops.length - 1 && (s.stopName === 'Destination Terminal' || s.stopName === '')) {
+          return { ...s, stopName: endLoc };
+        }
+        return s;
+      });
+
       const res = await client.post('/routes', {
         name: routeName,
         startLocation: startLoc,
         endLocation: endLoc,
-        stops: stops.map(s => ({
+        stops: finalStops.map(s => ({
           ...s,
           latitude: parseFloat(s.latitude as any),
           longitude: parseFloat(s.longitude as any),
@@ -264,7 +275,7 @@ const RoutesPage: React.FC = () => {
                     className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
                   />
                   <label htmlFor="routeName" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none transition-all peer-focus:top-0 peer-focus:scale-90 peer-focus:bg-white peer-focus:px-2 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:scale-90 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-2">
-                    Route Reference Name (e.g. Route 101 - Majestic to E-City)
+                    Route Reference Name (e.g. Route 101 - Kashmere Gate to Anand Vihar)
                   </label>
                 </div>
 
@@ -275,7 +286,10 @@ const RoutesPage: React.FC = () => {
                       id="startLoc"
                       required
                       value={startLoc}
-                      onChange={(e) => setStartLoc(e.target.value)}
+                      onChange={(e) => {
+                        setStartLoc(e.target.value);
+                        handleStopChange(0, 'stopName', e.target.value);
+                      }}
                       placeholder=" "
                       className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
                     />
@@ -290,7 +304,10 @@ const RoutesPage: React.FC = () => {
                       id="endLoc"
                       required
                       value={endLoc}
-                      onChange={(e) => setEndLoc(e.target.value)}
+                      onChange={(e) => {
+                        setEndLoc(e.target.value);
+                        handleStopChange(stops.length - 1, 'stopName', e.target.value);
+                      }}
                       placeholder=" "
                       className="peer w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-slate-800 text-sm outline-none focus:bg-white focus:border-primary-500 transition-all"
                     />
