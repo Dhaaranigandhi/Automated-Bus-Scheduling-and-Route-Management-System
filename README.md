@@ -142,3 +142,6 @@ http://localhost:5000
 #### Default Credentials
 - **Email**: `admin@smartbus.com`
 - **Password**: `admin123`
+
+
+Prototype URL : https://drive.google.com/file/d/1qtuqURzs9YroxsAOI4whFz780SVCY8uF/view?usp=drive_link
